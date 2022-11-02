@@ -8,29 +8,38 @@ namespace BASA
 
     public class PlayerController : MonoBehaviour
     {
+        [Header("Config Personagem")]
         public CharacterController controle;
         public float velocidade = 6f;
         public float alturaPulo = 3f;
         public float gravidade = -20f;
+        public bool estaCorrendo;
 
+        [Header("Verifica chao")]
         public Transform checaChao;
         public float raioEsfera = 0.4f;
         public LayerMask chaoMask;
         public bool estaNoChao;
-
         Vector3 velocidadeCai;
 
+        [Header("Verifica Abaixado")]
         public Transform cameraTransform;
         public bool estaAbaixado;
         public bool levantarBloquado;
         public float alturaLevantado, alturaAbaixado, posicaoCameraEmPe, posicaoCameraAbaixado;
         float velocidadeCorrente = 1f;
         RaycastHit hit;
-        public bool estaCorrendo;
+
+        [Header("Status Personagem")]
+        public float hp = 100;
+        public float stamina = 100;
+        public bool cansado;
+
 
         // Start is called before the first frame update
         void Start()
         {
+            cansado = false;
             estaCorrendo = false;
             controle = GetComponent<CharacterController>();
             estaAbaixado = false;
@@ -43,6 +52,7 @@ namespace BASA
             Verificacoes();
             MovimentoAbaixa();
             Inputs();
+            CondicaoPlayer();
 
         }
 
@@ -96,14 +106,18 @@ namespace BASA
 
         void Inputs()
         {
-            if (Input.GetKey(KeyCode.LeftShift) && estaNoChao)
+            if (Input.GetKey(KeyCode.LeftShift) && estaNoChao && !estaAbaixado && !cansado)
             {
                 estaCorrendo = true;
                 velocidade = 9f;
+                stamina -= 0.3f;
+                stamina = Mathf.Clamp(stamina, 0, 100);
             }
             else
             {
                 estaCorrendo = false;
+                stamina += 0.1f;
+                stamina = Mathf.Clamp(stamina, 0, 100);
             }
             if (Input.GetButtonDown("Jump") && estaNoChao)
             {
@@ -147,6 +161,21 @@ namespace BASA
             Gizmos.color = Color.yellow;
             Gizmos.DrawSphere(checaChao.position, raioEsfera);
         }
-    }
-}
 
+        void CondicaoPlayer()
+        {
+            if(stamina == 0)
+            {
+                cansado = true;
+
+            }
+
+            if(stamina > 20)
+            {
+                cansado = false;
+            }
+        }
+    }
+
+    
+}
