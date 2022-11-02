@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+namespace BASA
+{
+    
 public class PlayerController : MonoBehaviour
 {
     public CharacterController controle;
@@ -143,4 +145,5 @@ public class PlayerController : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawSphere(checaChao.position, raioEsfera);
     }
+}
 }
