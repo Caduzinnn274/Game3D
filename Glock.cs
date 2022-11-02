@@ -51,7 +51,7 @@ public class Glock : MonoBehaviour
 
         
 
-        if (Physics.SphereCast(ray, 0.1f, out hit))
+        if (Physics.Raycast(Camera.main.transform.position, ray.direction, out hit))
         {
             InstanciaEfeitos();
             if(hit.transform.tag == "objArrasta")
