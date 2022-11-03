@@ -15,24 +15,49 @@ public class Glock : MonoBehaviour
     public GameObject efeitoTiro;
     public GameObject posEfeitoTiro;
 
+    public AudioSource audioArma;
+    public int carregador = 3;
+    public int municao = 17;
+
     // Start is called before the first frame update
     void Start()
     {
         estaAtirando = false;
         anim = GetComponent<Animator>();
+        audioArma = GetComponent<AudioSource>();
         
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(anim.GetBool("OcorreAlgo"))
+        {
+            return;
+        }
         if(Input.GetButtonDown("Fire1"))
         {
-            if(!estaAtirando)
+            if(!estaAtirando && municao > 0)
             {
+                municao--;
+                audioArma.Play();
                 estaAtirando = true;
                 StartCoroutine(Atirando());
             }
+            else if(!estaAtirando && municao == 0 && carregador > 0)
+            {
+                anim.Play("Recarregar");
+                carregador--; ;
+                municao = 17;
+
+            }
+           
+        }
+        if(Input.GetKeyDown(KeyCode.R) && carregador > 0 && municao < 17)
+        {
+            anim.Play("Recarregar");
+            carregador--;
+            municao = 17;
         }
     }
 
@@ -51,7 +76,7 @@ public class Glock : MonoBehaviour
 
         
 
-        if (Physics.Raycast(Camera.main.transform.position, ray.direction, out hit))
+        if (Physics.Raycast(new Vector3(ray.origin.x + Random.Range(-0.05f, 0.05f), ray.origin.y + Random.Range(-0.05f, 0.05f), ray.origin.z), Camera.main.transform.forward, out hit))
         {
             InstanciaEfeitos();
             if(hit.transform.tag == "objArrasta")
