@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using BASA;
 
 public class Glock : MonoBehaviour
 {
@@ -16,30 +17,56 @@ public class Glock : MonoBehaviour
     public GameObject posEfeitoTiro;
 
     public AudioSource audioArma;
+    public AudioClip[] sonsArma;
     public int carregador = 3;
     public int municao = 17;
+    UIManager uiScript;
+    public GameObject posUI;
+
+    public bool automatico;
+
 
     // Start is called before the first frame update
     void Start()
     {
+        automatico = false;
         estaAtirando = false;
         anim = GetComponent<Animator>();
         audioArma = GetComponent<AudioSource>();
-        
+        uiScript = GameObject.FindWithTag("uiManager").GetComponent<UIManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        uiScript.municao.transform.position = Camera.main.WorldToScreenPoint(posUI.transform.position);
+        uiScript.municao.text = municao.ToString() + "/" + carregador.ToString();
         if(anim.GetBool("OcorreAlgo"))
         {
             return;
         }
-        if(Input.GetButtonDown("Fire1"))
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            audioArma.clip = sonsArma[1];
+            audioArma.Play();
+            automatico = !automatico;
+
+            if(automatico)
+            {
+                uiScript.imagemModoTiro.sprite = uiScript.spriteModoTiro[1];
+            }
+            else
+            {
+                uiScript.imagemModoTiro.sprite = uiScript.spriteModoTiro[0];
+
+            }
+        }
+        if(Input.GetButtonDown("Fire1") || automatico?Input.GetButton("Fire1"):false)
         {
             if(!estaAtirando && municao > 0)
             {
                 municao--;
+                audioArma.clip = sonsArma[0];
                 audioArma.Play();
                 estaAtirando = true;
                 StartCoroutine(Atirando());
@@ -50,6 +77,11 @@ public class Glock : MonoBehaviour
                 carregador--; ;
                 municao = 17;
 
+            }
+            else if(municao == 0 && carregador == 0)
+            {
+                audioArma.clip = sonsArma[3];
+                audioArma.Play();
             }
            
         }
@@ -104,4 +136,17 @@ public class Glock : MonoBehaviour
         GameObject buracoObj = Instantiate(buraco, hit.point, Quaternion.FromToRotation(Vector3.up, hit.normal));
         buracoObj.transform.parent = hit.transform;
     }
+
+    void SomMagazine()
+    {
+        audioArma.clip = sonsArma[1];
+        audioArma.Play();
+    }
+
+    void SomUp()
+    {
+        audioArma.clip = sonsArma[2];
+        audioArma.Play();
+    }
 }
+
